@@ -19,6 +19,7 @@ export interface Event {
   time: string
   location: string
   notes?: string
+  cancelled?: boolean
   created_at: string
 }
 
