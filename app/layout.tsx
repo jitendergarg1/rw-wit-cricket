@@ -5,6 +5,12 @@ import NavBar from '@/components/NavBar'
 export const metadata: Metadata = {
   title: 'R&W-Wit Cricket',
   description: 'Team management for R&W-Wit Cricket',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'R&W-Wit',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
