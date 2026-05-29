@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useAdmin } from '@/hooks/useAdmin'
 import type { Member, Assignment } from '@/lib/types'
 import { Plus, X } from 'lucide-react'
 
@@ -17,7 +16,6 @@ export default function AssignmentPanel({ eventId, members }: Props) {
   const [selectedPerson, setSelectedPerson] = useState('')
   const [selectedRole, setSelectedRole] = useState(PRESET_ROLES[0])
   const [customRole, setCustomRole] = useState('')
-  const { isAdmin } = useAdmin()
   const supabase = createClient()
 
   const people: { id: string; label: string; isParent: boolean }[] = []
@@ -79,59 +77,55 @@ export default function AssignmentPanel({ eventId, members }: Props) {
               <span className="text-xs font-medium text-red-700">{a.role}</span>
               <span className="text-xs text-gray-500 ml-2">{getLabel(a)}</span>
             </div>
-            {isAdmin && (
-              <button onClick={() => removeAssignment(a.id)} className="text-gray-300 hover:text-red-500">
-                <X size={13} />
-              </button>
-            )}
+            <button onClick={() => removeAssignment(a.id)} className="text-gray-300 hover:text-red-500">
+              <X size={13} />
+            </button>
           </div>
         ))}
       </div>
 
-      {isAdmin && (
-        <div className="flex flex-col gap-2">
-          <select
-            value={selectedPerson}
-            onChange={(e) => setSelectedPerson(e.target.value)}
-            className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 w-full"
-          >
-            <option value="">Select person…</option>
-            {people.some((p) => p.isParent) && (
-              <optgroup label="Parents">
-                {people.filter((p) => p.isParent).map((p) => (
-                  <option key={p.id} value={p.id}>{p.label}</option>
-                ))}
-              </optgroup>
-            )}
-            <optgroup label="Players">
-              {people.filter((p) => !p.isParent).map((p) => (
+      <div className="flex flex-col gap-2">
+        <select
+          value={selectedPerson}
+          onChange={(e) => setSelectedPerson(e.target.value)}
+          className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 w-full"
+        >
+          <option value="">Select person…</option>
+          {people.some((p) => p.isParent) && (
+            <optgroup label="Parents">
+              {people.filter((p) => p.isParent).map((p) => (
                 <option key={p.id} value={p.id}>{p.label}</option>
               ))}
             </optgroup>
+          )}
+          <optgroup label="Players">
+            {people.filter((p) => !p.isParent).map((p) => (
+              <option key={p.id} value={p.id}>{p.label}</option>
+            ))}
+          </optgroup>
+        </select>
+        <div className="flex gap-1.5">
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
+          >
+            {PRESET_ROLES.map((r) => <option key={r}>{r}</option>)}
+            <option value="Custom">Custom…</option>
           </select>
-          <div className="flex gap-1.5">
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
+          {selectedRole === 'Custom' && (
+            <input
+              value={customRole}
+              onChange={(e) => setCustomRole(e.target.value)}
+              placeholder="Role name"
               className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
-            >
-              {PRESET_ROLES.map((r) => <option key={r}>{r}</option>)}
-              <option value="Custom">Custom…</option>
-            </select>
-            {selectedRole === 'Custom' && (
-              <input
-                value={customRole}
-                onChange={(e) => setCustomRole(e.target.value)}
-                placeholder="Role name"
-                className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
-              />
-            )}
-            <button onClick={addAssignment} className="bg-red-700 text-white rounded-lg px-2 py-1.5 hover:bg-red-800 transition-colors">
-              <Plus size={14} />
-            </button>
-          </div>
+            />
+          )}
+          <button onClick={addAssignment} className="bg-red-700 text-white rounded-lg px-2 py-1.5 hover:bg-red-800 transition-colors">
+            <Plus size={14} />
+          </button>
         </div>
-      )}
+      </div>
     </div>
   )
 }
