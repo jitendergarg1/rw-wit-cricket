@@ -7,8 +7,8 @@ alter table members add column if not exists last_name text;
 alter table members add column if not exists parent_name text;
 alter table members add column if not exists parent_phone text;
 
--- Backfill existing name into first_name
-update members set first_name = name where first_name is null;
+-- Drop the not-null constraint on name so we can use first_name/last_name instead
+alter table members alter column name drop not null;
 
 -- Delete old sample data and insert real team members
 delete from members;
