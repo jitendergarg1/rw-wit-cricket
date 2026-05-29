@@ -1,0 +1,57 @@
+'use client'
+import { useState } from 'react'
+import { format, parseISO } from 'date-fns'
+import { MapPin, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import type { Event, Member } from '@/lib/types'
+import AttendancePanel from './AttendancePanel'
+import AssignmentPanel from './AssignmentPanel'
+
+interface Props {
+  matches: Event[]
+  members: Member[]
+}
+
+export default function MatchList({ matches, members }: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null)
+
+  if (!matches.length) return <p className="text-gray-400 text-center py-16">No matches scheduled.</p>
+
+  return (
+    <div className="space-y-3">
+      {matches.map((match) => (
+        <div key={match.id} className="bg-white rounded-xl shadow border border-gray-100">
+          <div
+            className="flex items-center justify-between p-4 cursor-pointer"
+            onClick={() => setExpanded(expanded === match.id ? null : match.id)}
+          >
+            <div className="flex items-start gap-3">
+              <div className="text-center bg-green-50 rounded-lg px-3 py-1 min-w-[52px]">
+                <div className="text-xs text-green-500 font-medium uppercase">{format(parseISO(match.date), 'MMM')}</div>
+                <div className="text-xl font-bold text-green-700 leading-tight">{format(parseISO(match.date), 'd')}</div>
+                <div className="text-xs text-green-400">{format(parseISO(match.date), 'EEE')}</div>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">{match.title}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-500 mt-1 flex-wrap">
+                  <span className="flex items-center gap-1"><Clock size={12} />{match.time.slice(0, 5)}</span>
+                  <span className="flex items-center gap-1"><MapPin size={12} />{match.location}</span>
+                </div>
+                {match.notes && <p className="text-xs text-gray-400 mt-1">{match.notes}</p>}
+              </div>
+            </div>
+            {expanded === match.id
+              ? <ChevronUp size={18} className="text-gray-400" />
+              : <ChevronDown size={18} className="text-gray-400" />}
+          </div>
+
+          {expanded === match.id && (
+            <div className="border-t border-gray-100 p-4 grid sm:grid-cols-2 gap-4">
+              <AttendancePanel eventId={match.id} members={members} />
+              <AssignmentPanel eventId={match.id} members={members} />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}

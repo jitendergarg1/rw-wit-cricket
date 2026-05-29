@@ -1,10 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Users, Trophy } from 'lucide-react'
+import { Dumbbell, Trophy, Users } from 'lucide-react'
 
 const links = [
-  { href: '/', label: 'Schedule', icon: CalendarDays },
+  { href: '/', label: 'Trainings', icon: Dumbbell },
+  { href: '/matches', label: 'Matches', icon: Trophy },
   { href: '/members', label: 'Members', icon: Users },
 ]
 

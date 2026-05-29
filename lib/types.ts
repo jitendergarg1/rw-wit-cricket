@@ -2,9 +2,12 @@ export type EventType = 'training' | 'match'
 
 export interface Member {
   id: string
-  name: string
-  email: string
+  first_name: string
+  last_name: string
+  email?: string
   phone?: string
+  parent_name?: string
+  parent_phone?: string
   created_at: string
 }
 

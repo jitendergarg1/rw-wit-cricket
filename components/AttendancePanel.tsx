@@ -55,7 +55,9 @@ export default function AttendancePanel({ eventId, members }: Props) {
       <div className="space-y-2">
         {members.map((member) => (
           <div key={member.id} className="flex items-center justify-between">
-            <span className="text-sm text-gray-700 truncate max-w-[120px]">{member.name}</span>
+            <span className="text-sm text-gray-700 truncate max-w-[130px]">
+              {member.first_name} {member.last_name}
+            </span>
             <div className="flex gap-1">
               {(Object.entries(STATUS_CONFIG) as [string, typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([status, cfg]) => {
                 const Icon = cfg.icon
