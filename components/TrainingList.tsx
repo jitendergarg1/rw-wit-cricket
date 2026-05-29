@@ -22,19 +22,31 @@ export default function TrainingList({ trainings, members }: Props) {
     const supabase = createClient()
     const ids = trainings.map((t) => t.id)
     if (!ids.length) return
-    supabase
-      .from('attendance')
-      .select('event_id, member_id')
-      .in('event_id', ids)
-      .eq('status', 'not_attending')
-      .then(({ data }) => {
-        const map: Record<string, Set<string>> = {}
-        data?.forEach(({ event_id, member_id }) => {
-          if (!map[event_id]) map[event_id] = new Set()
-          map[event_id].add(member_id)
+
+    function loadAbsence() {
+      supabase
+        .from('attendance')
+        .select('event_id, member_id')
+        .in('event_id', ids)
+        .eq('status', 'not_attending')
+        .then(({ data }) => {
+          const map: Record<string, Set<string>> = {}
+          data?.forEach(({ event_id, member_id }) => {
+            if (!map[event_id]) map[event_id] = new Set()
+            map[event_id].add(member_id)
+          })
+          setAbsentMap(map)
         })
-        setAbsentMap(map)
-      })
+    }
+
+    loadAbsence()
+
+    const channel = supabase
+      .channel('training-attendance')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance' }, loadAbsence)
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [trainings])
 
   async function toggleCancel(eventId: string) {
