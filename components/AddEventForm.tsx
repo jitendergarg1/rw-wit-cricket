@@ -2,12 +2,16 @@
 import { useState } from 'react'
 import { PlusCircle, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useAdmin } from '@/hooks/useAdmin'
 import { useRouter } from 'next/navigation'
 
 export default function AddEventForm() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { isAdmin } = useAdmin()
   const router = useRouter()
+
+  if (!isAdmin) return null
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

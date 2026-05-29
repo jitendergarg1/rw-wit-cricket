@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useAdmin } from '@/hooks/useAdmin'
 import type { Member, Assignment } from '@/lib/types'
 import { Plus, X } from 'lucide-react'
 
@@ -16,9 +17,9 @@ export default function AssignmentPanel({ eventId, members }: Props) {
   const [selectedPerson, setSelectedPerson] = useState('')
   const [selectedRole, setSelectedRole] = useState(PRESET_ROLES[0])
   const [customRole, setCustomRole] = useState('')
+  const { isAdmin } = useAdmin()
   const supabase = createClient()
 
-  // Build a flat list of assignable people: parents first, then players without parents
   const people: { id: string; label: string; isParent: boolean }[] = []
   members.forEach((m) => {
     if (m.parent_name) {
@@ -41,12 +42,10 @@ export default function AssignmentPanel({ eventId, members }: Props) {
     if (!selectedPerson) return
     const role = selectedRole === 'Custom' ? customRole.trim() : selectedRole
     if (!role) return
-
     const isParent = selectedPerson.startsWith('parent:')
     const memberId = selectedPerson.replace(/^(parent:|player:)/, '')
     const person = people.find((p) => p.id === selectedPerson)
     const displayName = person?.label ?? ''
-
     const { data } = await supabase
       .from('assignments')
       .insert({ event_id: eventId, member_id: memberId, role, display_name: displayName, is_parent: isParent })
@@ -80,58 +79,59 @@ export default function AssignmentPanel({ eventId, members }: Props) {
               <span className="text-xs font-medium text-red-700">{a.role}</span>
               <span className="text-xs text-gray-500 ml-2">{getLabel(a)}</span>
             </div>
-            <button onClick={() => removeAssignment(a.id)} className="text-gray-300 hover:text-red-500">
-              <X size={13} />
-            </button>
+            {isAdmin && (
+              <button onClick={() => removeAssignment(a.id)} className="text-gray-300 hover:text-red-500">
+                <X size={13} />
+              </button>
+            )}
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <select
-          value={selectedPerson}
-          onChange={(e) => setSelectedPerson(e.target.value)}
-          className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 w-full"
-        >
-          <option value="">Select person…</option>
-          {people.some((p) => p.isParent) && (
-            <optgroup label="Parents">
-              {people.filter((p) => p.isParent).map((p) => (
+      {isAdmin && (
+        <div className="flex flex-col gap-2">
+          <select
+            value={selectedPerson}
+            onChange={(e) => setSelectedPerson(e.target.value)}
+            className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 w-full"
+          >
+            <option value="">Select person…</option>
+            {people.some((p) => p.isParent) && (
+              <optgroup label="Parents">
+                {people.filter((p) => p.isParent).map((p) => (
+                  <option key={p.id} value={p.id}>{p.label}</option>
+                ))}
+              </optgroup>
+            )}
+            <optgroup label="Players">
+              {people.filter((p) => !p.isParent).map((p) => (
                 <option key={p.id} value={p.id}>{p.label}</option>
               ))}
             </optgroup>
-          )}
-          <optgroup label="Players">
-            {people.filter((p) => !p.isParent).map((p) => (
-              <option key={p.id} value={p.id}>{p.label}</option>
-            ))}
-          </optgroup>
-        </select>
-        <div className="flex gap-1.5">
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
-          >
-            {PRESET_ROLES.map((r) => <option key={r}>{r}</option>)}
-            <option value="Custom">Custom…</option>
           </select>
-          {selectedRole === 'Custom' && (
-            <input
-              value={customRole}
-              onChange={(e) => setCustomRole(e.target.value)}
-              placeholder="Role name"
+          <div className="flex gap-1.5">
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
               className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
-            />
-          )}
-          <button
-            onClick={addAssignment}
-            className="bg-red-700 text-white rounded-lg px-2 py-1.5 hover:bg-red-800 transition-colors"
-          >
-            <Plus size={14} />
-          </button>
+            >
+              {PRESET_ROLES.map((r) => <option key={r}>{r}</option>)}
+              <option value="Custom">Custom…</option>
+            </select>
+            {selectedRole === 'Custom' && (
+              <input
+                value={customRole}
+                onChange={(e) => setCustomRole(e.target.value)}
+                placeholder="Role name"
+                className="border rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-red-300 flex-1"
+              />
+            )}
+            <button onClick={addAssignment} className="bg-red-700 text-white rounded-lg px-2 py-1.5 hover:bg-red-800 transition-colors">
+              <Plus size={14} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

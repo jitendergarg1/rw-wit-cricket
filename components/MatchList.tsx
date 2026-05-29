@@ -1,8 +1,11 @@
 'use client'
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { MapPin, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { MapPin, Clock, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import type { Event, Member } from '@/lib/types'
+import { useAdmin } from '@/hooks/useAdmin'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import AttendancePanel from './AttendancePanel'
 import AssignmentPanel from './AssignmentPanel'
 
@@ -13,6 +16,14 @@ interface Props {
 
 export default function MatchList({ matches, members }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null)
+  const { isAdmin } = useAdmin()
+  const router = useRouter()
+
+  async function deleteMatch(id: string) {
+    if (!confirm('Delete this match?')) return
+    await createClient().from('events').delete().eq('id', id)
+    router.refresh()
+  }
 
   if (!matches.length) return <p className="text-gray-400 text-center py-16">No matches scheduled.</p>
 
@@ -39,9 +50,17 @@ export default function MatchList({ matches, members }: Props) {
                 {match.notes && <p className="text-xs text-gray-400 mt-1">{match.notes}</p>}
               </div>
             </div>
-            {expanded === match.id
-              ? <ChevronUp size={18} className="text-gray-400" />
-              : <ChevronDown size={18} className="text-gray-400" />}
+            <div className="flex items-center gap-2">
+              {isAdmin && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); deleteMatch(match.id) }}
+                  className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                >
+                  <Trash2 size={15} />
+                </button>
+              )}
+              {expanded === match.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+            </div>
           </div>
 
           {expanded === match.id && (
