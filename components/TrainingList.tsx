@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { MapPin, Clock, XCircle, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { useAdmin } from '@/hooks/useAdmin'
 import type { Event, Member } from '@/lib/types'
 
 interface Props {
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function TrainingList({ trainings, members }: Props) {
-  const { isAdmin } = useAdmin()
   const [absentMap, setAbsentMap] = useState<Record<string, Set<string>>>({})
   const [cancelledIds, setCancelledIds] = useState<Set<string>>(
     new Set(trainings.filter((t) => t.cancelled).map((t) => t.id))
@@ -115,19 +113,17 @@ export default function TrainingList({ trainings, members }: Props) {
                       <p className="text-xs text-red-500 mt-1">{absentCount} player{absentCount > 1 ? 's' : ''} can&apos;t make it</p>
                     )}
                   </div>
-                  {isAdmin && (
-                    <button
-                      onClick={() => toggleCancel(t.id)}
-                      title={isCancelled ? 'Restore training' : 'Cancel training'}
-                      className={`flex items-center gap-1 text-xs px-2 py-1 rounded-lg border transition-colors ml-2 ${
-                        isCancelled
-                          ? 'border-green-300 text-green-600 hover:bg-green-50'
-                          : 'border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500'
-                      }`}
-                    >
-                      {isCancelled ? <><RotateCcw size={12} /> Restore</> : <><XCircle size={12} /> Cancel</>}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => toggleCancel(t.id)}
+                    title={isCancelled ? 'Restore training' : 'Cancel training'}
+                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded-lg border transition-colors ml-2 ${
+                      isCancelled
+                        ? 'border-green-300 text-green-600 hover:bg-green-50'
+                        : 'border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-500'
+                    }`}
+                  >
+                    {isCancelled ? <><RotateCcw size={12} /> Restore</> : <><XCircle size={12} /> Cancel</>}
+                  </button>
                 </div>
               </div>
             </div>

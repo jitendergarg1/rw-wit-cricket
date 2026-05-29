@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { MapPin, Clock, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import type { Event, Member } from '@/lib/types'
-import { useAdmin } from '@/hooks/useAdmin'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import AttendancePanel from './AttendancePanel'
@@ -16,7 +15,6 @@ interface Props {
 
 export default function MatchList({ matches, members }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const { isAdmin } = useAdmin()
   const router = useRouter()
 
   function toggleExpand(id: string) {
@@ -59,14 +57,12 @@ export default function MatchList({ matches, members }: Props) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {isAdmin && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); deleteMatch(match.id) }}
-                  className="text-gray-300 hover:text-red-500 transition-colors p-1"
-                >
-                  <Trash2 size={15} />
-                </button>
-              )}
+              <button
+                onClick={(e) => { e.stopPropagation(); deleteMatch(match.id) }}
+                className="text-gray-300 hover:text-red-500 transition-colors p-1"
+              >
+                <Trash2 size={15} />
+              </button>
               {expanded.has(match.id) ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
             </div>
           </div>

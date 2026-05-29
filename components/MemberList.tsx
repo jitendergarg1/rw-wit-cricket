@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useAdmin } from '@/hooks/useAdmin'
 import type { Member } from '@/lib/types'
 import { UserPlus, Trash2, Phone, Users, Pencil } from 'lucide-react'
 
@@ -67,7 +66,6 @@ export default function MemberList({ members }: Props) {
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const { isAdmin } = useAdmin()
   const router = useRouter()
 
   async function handleAdd(data: typeof BLANK) {
@@ -94,7 +92,7 @@ export default function MemberList({ members }: Props) {
 
   return (
     <div className="space-y-4">
-      {isAdmin && !adding && (
+      {!adding && (
         <button
           onClick={() => setAdding(true)}
           className="flex items-center gap-2 bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 text-sm font-medium"
@@ -135,16 +133,14 @@ export default function MemberList({ members }: Props) {
                     </div>
                   )}
                 </div>
-                {isAdmin && (
-                  <div className="flex gap-2">
-                    <button onClick={() => setEditingId(m.id)} className="text-gray-300 hover:text-blue-500 transition-colors">
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => deleteMember(m.id)} className="text-gray-300 hover:text-red-500 transition-colors">
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                )}
+                <div className="flex gap-2">
+                  <button onClick={() => setEditingId(m.id)} className="text-gray-300 hover:text-blue-500 transition-colors">
+                    <Pencil size={15} />
+                  </button>
+                  <button onClick={() => deleteMember(m.id)} className="text-gray-300 hover:text-red-500 transition-colors">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
