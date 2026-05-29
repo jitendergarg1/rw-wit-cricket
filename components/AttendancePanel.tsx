@@ -19,26 +19,43 @@ export default function AttendancePanel({ eventId, members }: Props) {
   const [attendance, setAttendance] = useState<Record<string, string>>({})
   const supabase = createClient()
 
+  function applyRows(rows: Attendance[]) {
+    const map: Record<string, string> = {}
+    rows.forEach((a) => { map[a.member_id] = a.status })
+    setAttendance(map)
+  }
+
   useEffect(() => {
+    // Initial load
     supabase
       .from('attendance')
       .select('*')
       .eq('event_id', eventId)
-      .then(({ data }) => {
-        const map: Record<string, string> = {}
-        ;(data as Attendance[])?.forEach((a) => { map[a.member_id] = a.status })
-        setAttendance(map)
-      })
+      .then(({ data }) => applyRows((data as Attendance[]) ?? []))
+
+    // Real-time subscription
+    const channel = supabase
+      .channel(`attendance:${eventId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance', filter: `event_id=eq.${eventId}` },
+        () => {
+          supabase
+            .from('attendance')
+            .select('*')
+            .eq('event_id', eventId)
+            .then(({ data }) => applyRows((data as Attendance[]) ?? []))
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
   }, [eventId])
 
   async function toggle(memberId: string, status: string) {
     const current = attendance[memberId]
     if (current === status) {
       await supabase.from('attendance').delete().eq('event_id', eventId).eq('member_id', memberId)
-      setAttendance((prev) => { const n = { ...prev }; delete n[memberId]; return n })
     } else {
       await supabase.from('attendance').upsert({ event_id: eventId, member_id: memberId, status }, { onConflict: 'event_id,member_id' })
-      setAttendance((prev) => ({ ...prev, [memberId]: status }))
     }
   }
 
