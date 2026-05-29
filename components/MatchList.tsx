@@ -15,9 +15,17 @@ interface Props {
 }
 
 export default function MatchList({ matches, members }: Props) {
-  const [expanded, setExpanded] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const { isAdmin } = useAdmin()
   const router = useRouter()
+
+  function toggleExpand(id: string) {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
 
   async function deleteMatch(id: string) {
     if (!confirm('Delete this match?')) return
@@ -33,7 +41,7 @@ export default function MatchList({ matches, members }: Props) {
         <div key={match.id} className="bg-white rounded-xl shadow border border-gray-100">
           <div
             className="flex items-center justify-between p-4 cursor-pointer"
-            onClick={() => setExpanded(expanded === match.id ? null : match.id)}
+            onClick={() => toggleExpand(match.id)}
           >
             <div className="flex items-start gap-3">
               <div className="text-center bg-green-50 rounded-lg px-3 py-1 min-w-[52px]">
@@ -59,11 +67,11 @@ export default function MatchList({ matches, members }: Props) {
                   <Trash2 size={15} />
                 </button>
               )}
-              {expanded === match.id ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+              {expanded.has(match.id) ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
             </div>
           </div>
 
-          {expanded === match.id && (
+          {expanded.has(match.id) && (
             <div className="border-t border-gray-100 p-4 grid sm:grid-cols-2 gap-4">
               <AttendancePanel eventId={match.id} members={members} />
               <AssignmentPanel eventId={match.id} members={members} />
