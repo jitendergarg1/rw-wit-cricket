@@ -9,7 +9,7 @@ interface Props {
   members: Member[]
 }
 
-const PRESET_ROLES = ['Umpire', 'Lunch Provider', 'Scorer', 'Team Coach', 'Carpool']
+const PRESET_ROLES = ['Umpire', 'Lunch Provider', 'Scorer', 'Team Coach', 'Carpool', 'Spriet']
 
 export default function AssignmentPanel({ eventId, members }: Props) {
   const [assignments, setAssignments] = useState<Assignment[]>([])
