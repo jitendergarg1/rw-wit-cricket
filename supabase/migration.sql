@@ -28,18 +28,18 @@ insert into members (first_name, last_name, phone, parent_name, parent_phone) va
   ('Siddharth',    'Vijjapu',       '0684859730', 'Raju & Vidya',        '0684859730'),
   ('Veerle van den','Berg',         '0612965351', 'Pieter & Martine',    '0612965351');
 
--- Delete old events and insert real match schedule
+-- Delete old events and insert real match schedule (from Team info sheet)
 delete from events;
 
 insert into events (title, type, date, time, location, notes) values
-  ('vs ACC U13 2',               'match', '2026-05-03', '09:00', 'Home',                           'Arrival 08:30'),
-  ('vs Ajax - Dosto U11',        'match', '2026-05-10', '09:00', 'Home',                           'Arrival 08:30'),
-  ('vs ACC U11',                 'match', '2026-05-17', '09:00', 'Away',                           'Arrival 08:30 — see location link'),
-  ('vs QUI VIVE U11 1',          'match', '2026-05-24', '09:00', 'Home',                           'Arrival 08:30'),
-  ('vs VRA U11 1',               'match', '2026-05-31', '09:00', 'Away',                           'Arrival 08:30'),
-  ('vs VRA U11 2',               'match', '2026-06-07', '09:00', 'Home',                           'Arrival 08:30'),
-  ('vs QUI VIVE U11 2',          'match', '2026-06-14', '09:00', 'Away',                           'Arrival 08:30'),
-  ('vs BDAAL-HIL COMBI U11 1',   'match', '2026-06-21', '09:00', 'Away',                           'Arrival 08:30');
+  ('vs Rood en Wit 1',                 'match', '2026-05-03', '09:00', 'Home',  'Arrival 08:30 | Coach: Umesh | Umpire: Venkat, Raju | Scorer: Sridhar'),
+  ('vs Ajax - Dosto Combinatie U11',   'match', '2026-05-10', '09:00', 'Home',  'Arrival 08:30 | Coach: Umesh | Umpire: Shiv | Scorer: Sridhar | Lunch: Jitendar, Ramseshu, Venkat'),
+  ('vs ACC U 11',                      'match', '2026-05-17', '09:00', 'Away',  'Arrival 08:30 | Coach: Umesh | Scorer: Wladimir | maps.app.goo.gl/d7bxJbLYRGYTnfAW8'),
+  ('vs QUI VIVE U11 1',                'match', '2026-05-24', '09:00', 'Home',  'Arrival 08:30 | Coach: Umesh | Umpire: Jitendar | Scorer: Wladimir | Lunch: Pieter, Shiv'),
+  ('vs VRA U11 1',                     'match', '2026-05-31', '09:00', 'Away',  'Arrival 08:30 | Coach: Umesh | Scorer: Wladimir'),
+  ('vs VRA U11 2',                     'match', '2026-06-07', '09:00', 'Home',  'Arrival 08:30 | Coach: Umesh | Umpire: Sridhar | Lunch: Umesh, Kunal, Andrea'),
+  ('vs QUI VIVE U11 2',                'match', '2026-06-14', '09:00', 'Away',  'Arrival 08:30 | Coach: Umesh | Umpire: Sachin | Scorer: volunteer | Spriet: Andrea'),
+  ('vs BDAAL-HIL COMBI J U11 1',       'match', '2026-06-21', '09:00', 'Away',  'Arrival 08:30 | Coach: Umesh | Umpire: Pieter | Scorer: volunteer');
 
 -- Insert recurring Tuesday + Friday trainings (May 29 – June 27 2026)
 insert into events (title, type, date, time, location, notes) values
